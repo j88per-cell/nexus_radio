@@ -3,7 +3,7 @@
 A self-hostable web radio station app. Laravel + Liquidsoap + Icecast under
 the hood, with an admin UI for managing your music library, scheduling
 themed shows, and running the station live. Genre-agnostic — bring your own
-catalog and rotation rules. No AI/LLM dependency required.
+catalog and rotation rules. 
 
 Pairs conceptually with [Nexus.tv](https://github.com/j88per-cell) (a
 sibling project for movies/TV), but runs standalone.
