@@ -66,10 +66,10 @@ class ConnectionController extends Controller
     {
         $q = $request->q ?? '';
 
-        $artists = Artist::where('name', 'ilike', "%{$q}%")->limit(8)->get(['id', 'name', 'slug'])
+        $artists = Artist::whereRaw('LOWER(name) LIKE ?', ['%' . mb_strtolower($q) . '%'])->limit(8)->get(['id', 'name', 'slug'])
             ->map(fn($a) => ['id' => $a->id, 'name' => $a->name, 'slug' => $a->slug, 'type' => 'artist']);
 
-        $people = Person::where('name', 'ilike', "%{$q}%")->limit(8)->get(['id', 'name', 'slug'])
+        $people = Person::whereRaw('LOWER(name) LIKE ?', ['%' . mb_strtolower($q) . '%'])->limit(8)->get(['id', 'name', 'slug'])
             ->map(fn($p) => ['id' => $p->id, 'name' => $p->name, 'slug' => $p->slug, 'type' => 'person']);
 
         return response()->json($artists->concat($people)->sortBy('name')->values());
@@ -79,7 +79,7 @@ class ConnectionController extends Controller
     {
         $q = $request->q ?? '';
 
-        $releases = Release::where('title', 'ilike', "%{$q}%")
+        $releases = Release::whereRaw('LOWER(title) LIKE ?', ['%' . mb_strtolower($q) . '%'])
             ->with('artist')
             ->limit(10)
             ->get()

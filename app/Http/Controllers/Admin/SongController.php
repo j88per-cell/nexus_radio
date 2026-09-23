@@ -16,9 +16,9 @@ class SongController extends Controller
     {
         $songs = Song::query()
             ->when($request->search, fn($q) => $q->where(function ($q2) use ($request) {
-                $q2->where('title', 'ilike', "%{$request->search}%");
+                $q2->whereRaw('LOWER(title) LIKE ?', ['%' . mb_strtolower($request->search) . '%']);
             }))
-            ->when($request->artist, fn($q) => $q->whereHas('originalArtist', fn($q2) => $q2->where('name', 'ilike', "%{$request->artist}%")))
+            ->when($request->artist, fn($q) => $q->whereHas('originalArtist', fn($q2) => $q2->whereRaw('LOWER(name) LIKE ?', ['%' . mb_strtolower($request->artist) . '%'])))
             ->when($request->filter === 'no_lyrics',  fn($q) => $q->where(fn($q2) => $q2->whereNull('lyrics')->orWhere('lyrics', '')))
             ->when($request->filter === 'has_lyrics', fn($q) => $q->whereNotNull('lyrics')->where('lyrics', '!=', ''))
             ->when($request->filter === 'blocked',    fn($q) => $q->where('blocked', true))

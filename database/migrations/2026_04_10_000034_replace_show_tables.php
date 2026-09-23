@@ -16,6 +16,10 @@ return new class extends Migration
             $table->text('theme')->nullable();
             // manual: fixed tracklist; auto: station picks from library
             $table->string('mode')->default('auto');
+            // manual only: shuffle the curated tracklist each time the show goes
+            // live (a themed rotation), vs. play it in the exact curated order
+            // (a live DJ session with an intentional running order)
+            $table->boolean('shuffle')->default(false);
             // draft, active, live, done
             $table->string('status')->default('draft');
             // higher priority preempts lower; free play = 0

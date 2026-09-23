@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\ArtistController;
 use App\Http\Controllers\Admin\BandMemberController;
 use App\Http\Controllers\Admin\ConnectionController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\LiveController;
 use App\Http\Controllers\Admin\PeopleController;
 use App\Http\Controllers\Admin\ReleaseCreditController;
 use App\Http\Controllers\Admin\ReleaseController;
@@ -83,6 +84,10 @@ Route::prefix('admin')->middleware('auth')->name('admin.')->group(function () {
     Route::post('shows/{show}/stop',       [ShowController::class, 'stop'])->name('shows.stop');
     Route::post('shows/free-play/pause',   [ShowController::class, 'pauseFreePlay'])->name('shows.free-play.pause');
     Route::post('shows/free-play/resume',  [ShowController::class, 'resumeFreePlay'])->name('shows.free-play.resume');
+
+    Route::get('live', [LiveController::class, 'index'])->name('live');
+    Route::post('live/mute', [LiveController::class, 'mute'])->name('live.mute');
+    Route::post('live/unmute', [LiveController::class, 'unmute'])->name('live.unmute');
 
     Route::get('songs', [SongController::class, 'index'])->name('songs');
     Route::patch('songs/{song}', [SongController::class, 'update'])->name('songs.update');

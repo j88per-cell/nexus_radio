@@ -57,6 +57,7 @@ function blankForm() {
         description:      '',
         theme:            '',
         mode:             'auto',
+        shuffle:          false,
         status:           'draft',
         priority:         0,
         recurrence:       'once',
@@ -91,6 +92,7 @@ function startEdit(show) {
         description:      show.description ?? '',
         theme:            show.theme ?? '',
         mode:             show.mode,
+        shuffle:          show.shuffle ?? false,
         status:           show.status,
         priority:         show.priority,
         recurrence:       show.recurrence,
@@ -317,6 +319,7 @@ async function saveTracks() {
                             <span class="font-medium text-white">{{ show.name }}</span>
                             <span :class="['text-xs px-1.5 py-0.5 rounded', statusColor[show.status]]">{{ show.status }}</span>
                             <span class="text-xs text-zinc-400 bg-zinc-800 px-1.5 py-0.5 rounded">{{ modeLabel[show.mode] }}</span>
+                            <span v-if="show.mode === 'manual' && show.shuffle" class="text-xs text-zinc-400 bg-zinc-800 px-1.5 py-0.5 rounded">🔀 shuffle</span>
                             <span v-if="show.locked" class="text-xs text-amber-500 bg-amber-950/50 px-1.5 py-0.5 rounded">🔒 locked</span>
                         </div>
                         <div class="text-xs text-zinc-500 mt-1 flex flex-wrap gap-x-4">

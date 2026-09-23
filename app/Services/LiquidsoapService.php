@@ -57,6 +57,50 @@ class LiquidsoapService
     }
 
     /**
+     * Mute the live DJ mic input without dropping the source connection —
+     * the DJ's broadcasting client stays connected, radio.liq just stops
+     * routing it to the stream (falls back to the normal track queue).
+     */
+    public function muteLive(): void
+    {
+        $this->command('var.set mic_muted = true');
+    }
+
+    public function unmuteLive(): void
+    {
+        $this->command('var.set mic_muted = false');
+    }
+
+    /**
+     * Whether the mic is currently muted, per radio.liq's `mic_muted`
+     * interactive variable. Null if the telnet call itself failed (e.g.
+     * Liquidsoap unreachable) — distinct from a real false/unmuted response.
+     */
+    public function isLiveMuted(): ?bool
+    {
+        $response = $this->command('var.get mic_muted');
+
+        if ($response === null) {
+            return null;
+        }
+
+        return str_contains(trim($response), 'true');
+    }
+
+    /**
+     * Raw status text for the harbor mic input (e.g. whether a source client
+     * is currently connected), straight from Liquidsoap's own `<mount>.status`
+     * telnet command. Shown as-is on the admin Live page rather than parsed —
+     * the exact wording varies by Liquidsoap version.
+     */
+    public function liveStatus(): ?string
+    {
+        $mount = config('radio.harbor.mount', 'live');
+
+        return $this->command("{$mount}.status");
+    }
+
+    /**
      * Send a raw telnet command and return the response.
      */
     public function command(string $cmd): ?string

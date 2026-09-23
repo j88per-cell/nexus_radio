@@ -11,7 +11,9 @@ return new class extends Migration
     {
         // Purge song_tags and reset its sequence
         DB::table('song_tags')->truncate();
-        DB::statement("ALTER SEQUENCE song_tags_id_seq RESTART WITH 1");
+        if (DB::connection()->getDriverName() === 'pgsql') {
+            DB::statement("ALTER SEQUENCE song_tags_id_seq RESTART WITH 1");
+        }
 
         Schema::create('track_tags', function (Blueprint $table) {
             $table->id();

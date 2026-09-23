@@ -141,7 +141,7 @@ class PickNextTrackJob implements ShouldQueue
                 ->whereHas('song', fn($q) => $q
                     ->where('blocked', false)
                     ->when($recentTitlePrefixes, fn($q2) => $q2
-                        ->whereNotIn(DB::raw('LOWER(LEFT(title, 8))'), $recentTitlePrefixes))
+                        ->whereNotIn(DB::raw('LOWER(SUBSTR(title, 1, 8))'), $recentTitlePrefixes))
                     ->whereDoesntHave('tags', fn($t) => $t->whereIn('tag', SongTag::FREE_PLAY_EXCLUDED))
                 )
                 ->inRandomOrder()
@@ -157,7 +157,7 @@ class PickNextTrackJob implements ShouldQueue
                 ->whereHas('song', fn($q) => $q
                     ->where('blocked', false)
                     ->when($recentTitlePrefixes, fn($q2) => $q2
-                        ->whereNotIn(DB::raw('LOWER(LEFT(title, 8))'), $recentTitlePrefixes))
+                        ->whereNotIn(DB::raw('LOWER(SUBSTR(title, 1, 8))'), $recentTitlePrefixes))
                     ->whereDoesntHave('tags', fn($t) => $t->whereIn('tag', SongTag::FREE_PLAY_EXCLUDED))
                 )
                 ->inRandomOrder()
@@ -186,7 +186,7 @@ class PickNextTrackJob implements ShouldQueue
             ->whereHas('song', fn($q) => $q
                 ->where('blocked', false)
                 ->when($recentTitlePrefixes, fn($q2) => $q2
-                    ->whereNotIn(DB::raw('LOWER(LEFT(title, 8))'), $recentTitlePrefixes))
+                    ->whereNotIn(DB::raw('LOWER(SUBSTR(title, 1, 8))'), $recentTitlePrefixes))
                 ->whereDoesntHave('tags', fn($t) => $t->whereIn('tag', SongTag::FREE_PLAY_EXCLUDED))
             )
             ->withCount('playHistory')

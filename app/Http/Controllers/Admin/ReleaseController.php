@@ -13,8 +13,8 @@ class ReleaseController extends Controller
     public function index(Request $request): Response
     {
         $releases = Release::query()
-            ->when($request->search, fn($q) => $q->where('title', 'ilike', "%{$request->search}%"))
-            ->when($request->artist, fn($q) => $q->whereHas('artist', fn($q2) => $q2->where('name', 'ilike', "%{$request->artist}%")))
+            ->when($request->search, fn($q) => $q->whereRaw('LOWER(title) LIKE ?', ['%' . mb_strtolower($request->search) . '%']))
+            ->when($request->artist, fn($q) => $q->whereHas('artist', fn($q2) => $q2->whereRaw('LOWER(name) LIKE ?', ['%' . mb_strtolower($request->artist) . '%'])))
             ->when($request->filter === 'blocked', fn($q) => $q->where('blocked', true))
             ->with('artist')
             ->orderBy('title')

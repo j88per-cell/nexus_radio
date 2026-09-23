@@ -2,17 +2,15 @@
 
 namespace App\Models;
 
-use App\Models\Concerns\HasEmbedding;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Pgvector\Laravel\Vector;
 
 class Person extends Model
 {
-    use HasEmbedding, HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'name',
@@ -32,7 +30,6 @@ class Person extends Model
             'born'          => 'date',
             'died'          => 'date',
             'mb_fetched_at' => 'datetime',
-            'embedding'     => Vector::class,
         ];
     }
 

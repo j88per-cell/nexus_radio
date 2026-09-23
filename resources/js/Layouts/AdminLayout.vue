@@ -26,6 +26,7 @@ const nav = [
         { label: 'Dashboard', href: '/admin/dashboard', name: 'admin.dashboard', ico: 'dashboard' },
         { label: 'Queue',     href: '/admin/queue',     name: 'admin.queue',     ico: 'queue' },
         { label: 'Shows',    href: '/admin/shows',    name: 'admin.shows',    ico: 'shows' },
+        { label: 'Live',     href: '/admin/live',     name: 'admin.live',     ico: 'broadcast' },
     ]},
     { group: 'Library', items: [
         { label: 'Artists',      href: '/admin/artists',         name: 'admin.artists',         ico: 'artists' },

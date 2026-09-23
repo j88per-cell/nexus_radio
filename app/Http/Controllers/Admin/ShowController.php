@@ -85,19 +85,19 @@ class ShowController extends Controller
             )
             ->when($q, fn($query) =>
                 $query->where(fn($sub) =>
-                    $sub->where('name', 'ilike', "%{$q}%")
-                        ->orWhere('bio', 'ilike', "%{$q}%")
-                        ->orWhere('story', 'ilike', "%{$q}%")
+                    $sub->whereRaw('LOWER(name) LIKE ?', ['%' . mb_strtolower($q) . '%'])
+                        ->orWhereRaw('LOWER(bio) LIKE ?', ['%' . mb_strtolower($q) . '%'])
+                        ->orWhereRaw('LOWER(story) LIKE ?', ['%' . mb_strtolower($q) . '%'])
                 )
             )
             ->when($yearFrom, fn($query) =>
                 $query->whereHas('releases', fn($r) =>
-                    $r->whereRaw("EXTRACT(YEAR FROM release_date) >= ?", [$yearFrom])
+                    $r->where('release_date', '>=', "{$yearFrom}-01-01")
                 )
             )
             ->when($yearTo, fn($query) =>
                 $query->whereHas('releases', fn($r) =>
-                    $r->whereRaw("EXTRACT(YEAR FROM release_date) <= ?", [$yearTo])
+                    $r->where('release_date', '<=', "{$yearTo}-12-31")
                 )
             )
             ->orderBy('name')
@@ -115,7 +115,8 @@ class ShowController extends Controller
         $artistId = $request->input('artist_id');
 
         $releases = Release::where('artist_id', $artistId)
-            ->orderByRaw('release_date ASC NULLS LAST')
+            ->orderByRaw('release_date IS NULL')
+            ->orderBy('release_date')
             ->orderBy('title')
             ->get(['id', 'title', 'release_date', 'type'])
             ->map(fn($r) => [
@@ -167,9 +168,9 @@ class ShowController extends Controller
             ->join('releases', 'tracks.release_id', '=', 'releases.id')
             ->join('artists', 'releases.artist_id', '=', 'artists.id')
             ->where(function ($query) use ($q) {
-                $query->where('songs.title', 'ilike', "%{$q}%")
-                      ->orWhere('artists.name', 'ilike', "%{$q}%")
-                      ->orWhere('releases.title', 'ilike', "%{$q}%");
+                $query->whereRaw('LOWER(songs.title) LIKE ?', ['%' . mb_strtolower($q) . '%'])
+                      ->orWhereRaw('LOWER(artists.name) LIKE ?', ['%' . mb_strtolower($q) . '%'])
+                      ->orWhereRaw('LOWER(releases.title) LIKE ?', ['%' . mb_strtolower($q) . '%']);
             })
             ->select(
                 'tracks.id',
@@ -279,6 +280,9 @@ class ShowController extends Controller
 
         if ($show->mode === Show::MODE_MANUAL) {
             $tracks = $show->tracks()->with('track')->get();
+            if ($show->shuffle) {
+                $tracks = $tracks->shuffle();
+            }
             foreach ($tracks as $showTrack) {
                 if (! $showTrack->track) {
                     continue;
@@ -348,6 +352,7 @@ class ShowController extends Controller
             'description'      => $show->description,
             'theme'            => $show->theme,
             'mode'             => $show->mode,
+            'shuffle'          => $show->shuffle,
             'status'           => $show->status,
             'priority'         => $show->priority,
             'recurrence'       => $show->recurrence,
@@ -387,6 +392,7 @@ class ShowController extends Controller
             'description'      => 'nullable|string',
             'theme'            => 'nullable|string',
             'mode'             => 'required|in:manual,auto',
+            'shuffle'          => 'boolean',
             'status'           => 'required|in:draft,active,live,done',
             'priority'         => 'required|integer|min:0|max:100',
             'recurrence'       => 'required|in:once,interval,daily,weekly',

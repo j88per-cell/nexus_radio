@@ -22,7 +22,7 @@ class EncyclopediaController extends Controller
         $people  = [];
 
         if ($q !== '') {
-            $artists = Artist::where('name', 'ilike', "%{$q}%")
+            $artists = Artist::whereRaw('LOWER(name) LIKE ?', ['%' . mb_strtolower($q) . '%'])
                 ->with('genres')
                 ->withCount('releases')
                 ->orderBy('name')
@@ -39,7 +39,7 @@ class EncyclopediaController extends Controller
                     'genre'          => $a->genres->firstWhere('pivot.primary', true)?->name ?? $a->genres->first()?->name,
                 ]);
 
-            $people = Person::where('name', 'ilike', "%{$q}%")
+            $people = Person::whereRaw('LOWER(name) LIKE ?', ['%' . mb_strtolower($q) . '%'])
                 ->withCount('artistMemberships')
                 ->orderBy('name')
                 ->limit(10)

@@ -81,6 +81,9 @@ class TransitionShows extends Command
         // For manual shows: push the tracklist as queue items with Navidrome stream URLs
         if ($show->mode === Show::MODE_MANUAL) {
             $tracks = $show->tracks()->with('track')->get();
+            if ($show->shuffle) {
+                $tracks = $tracks->shuffle();
+            }
             foreach ($tracks as $showTrack) {
                 if (! $showTrack->track) {
                     continue;

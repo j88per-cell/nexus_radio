@@ -35,6 +35,19 @@ function toggleDay(day) {
             </div>
         </div>
 
+        <!-- Shuffle (manual mode only) -->
+        <div v-if="form.mode === 'manual'">
+            <label class="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" v-model="form.shuffle" class="accent-red-500" />
+                <span class="text-sm text-zinc-300">Shuffle track order each time this show airs</span>
+            </label>
+            <p class="text-xs text-zinc-500 mt-1 ml-6">
+                {{ form.shuffle
+                    ? 'A themed rotation — random order through your curated list each run.'
+                    : 'Plays your curated list in the exact order you set below (e.g. a live DJ session).' }}
+            </p>
+        </div>
+
         <!-- Description -->
         <div>
             <label class="block text-xs text-zinc-400 mb-1">Description</label>

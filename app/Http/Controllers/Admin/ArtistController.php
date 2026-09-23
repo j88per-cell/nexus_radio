@@ -53,7 +53,7 @@ class ArtistController extends Controller
         $q    = $request->q ?? '';
         $slug = \Illuminate\Support\Str::slug($q);
 
-        $artists = Artist::where('name', 'ilike', "%{$q}%")
+        $artists = Artist::whereRaw('LOWER(name) LIKE ?', ['%' . mb_strtolower($q) . '%'])
             ->orWhere('slug', 'like', "%{$slug}%")
             ->orderBy('name')
             ->limit(10)

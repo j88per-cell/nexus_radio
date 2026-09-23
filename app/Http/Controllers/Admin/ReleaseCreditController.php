@@ -18,8 +18,8 @@ class ReleaseCreditController extends Controller
         $q = trim($request->search ?? '');
 
         $releases = Release::with(['artist', 'credits.person'])
-            ->when($q, fn($query) => $query->where('title', 'ilike', "%{$q}%")
-                ->orWhereHas('artist', fn($q2) => $q2->where('name', 'ilike', "%{$q}%")))
+            ->when($q, fn($query) => $query->whereRaw('LOWER(title) LIKE ?', ['%' . mb_strtolower($q) . '%'])
+                ->orWhereHas('artist', fn($q2) => $q2->whereRaw('LOWER(name) LIKE ?', ['%' . mb_strtolower($q) . '%'])))
             ->orderBy('release_date', 'desc')
             ->paginate(30)
             ->withQueryString()
@@ -69,7 +69,7 @@ class ReleaseCreditController extends Controller
         $q = $request->q ?? '';
 
         return response()->json(
-            Person::where('name', 'ilike', "%{$q}%")
+            Person::whereRaw('LOWER(name) LIKE ?', ['%' . mb_strtolower($q) . '%'])
                 ->orderBy('name')
                 ->limit(10)
                 ->get(['id', 'name', 'slug'])

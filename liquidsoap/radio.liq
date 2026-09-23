@@ -7,7 +7,15 @@ control_url  = "http://nexus-radio.home"
 # Station identity — override via env for your own deployment.
 station_name        = getenv(default="Nexus Radio", "STATION_NAME")
 station_description = getenv(default="Broadcasting from the void", "STATION_DESCRIPTION")
-station_genre       = getenv(default="", "STATION_GENRE")
+station_genre        = getenv(default="", "STATION_GENRE")
+
+# Live DJ mic input (manual DJ mode) — a DJ connects an Icecast-source-style
+# client (Mixxx, BUTT, OBS, etc.) directly to this harbor port/mount, not to
+# Icecast itself. Laravel never touches the audio; it only sends mute/unmute
+# over the telnet control channel below.
+harbor_port     = int_of_string(default=8001, getenv(default="8001", "LIQUIDSOAP_HARBOR_PORT"))
+harbor_password = getenv(default="passw0rd", "LIQUIDSOAP_HARBOR_PASSWORD")
+harbor_mount    = getenv(default="live", "LIQUIDSOAP_HARBOR_MOUNT")
 
 settings.server.telnet.set(true)
 settings.server.telnet.port.set(1234)
@@ -131,6 +139,31 @@ end
 
 thread.run(every={10.}, check_radio_health)
 
+# ── Live DJ mic input ───────────────────────────────────────────────────────
+# `mic_muted` is a telnet-controllable variable (var.get/var.set over the
+# telnet port above) — LiquidsoapService::command() drives it from Laravel's
+# mute/unmute buttons without ever touching the harbor connection itself, so
+# a DJ can mute between announcements without dropping their source.
+mic_muted = interactive.bool("mic_muted", false)
+
+mic_input = input.harbor(
+  id=harbor_mount,
+  harbor_mount,
+  port=harbor_port,
+  password=harbor_password,
+  buffer=2.,
+  timeout=10.
+)
+mic_input = mksafe(mic_input)
+
+# The mic takes over the stream only while actually connected AND unmuted;
+# otherwise the normal track queue keeps playing. First matching predicate
+# wins, evaluated continuously — no manual source-switching needed.
+on_air = switch(track_sensitive=false, [
+  ({source.is_ready(mic_input) and not mic_muted()}, mic_input),
+  ({true}, radio),
+])
+
 output.icecast(
   %mp3(bitrate=192),
   host=icecast_host,
@@ -140,7 +173,7 @@ output.icecast(
   name=station_name,
   description=station_description,
   genre=station_genre,
-  radio
+  on_air
 )
 
 output.icecast(
@@ -152,5 +185,5 @@ output.icecast(
   name="#{station_name} (Mobile)",
   description="#{station_description} — low bitrate",
   genre=station_genre,
-  radio
+  on_air
 )

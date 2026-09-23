@@ -29,6 +29,7 @@ class Show extends Model
         'description',
         'theme',
         'mode',
+        'shuffle',
         'status',
         'priority',
         'recurrence',
@@ -45,11 +46,12 @@ class Show extends Model
     protected function casts(): array
     {
         return [
-            'recurrence_days' => 'array',
-            'scheduled_at'    => 'datetime',
-            'next_run_at'     => 'datetime',
-            'last_run_at'     => 'datetime',
-            'live_until'      => 'datetime',
+            'shuffle'          => 'boolean',
+            'recurrence_days'  => 'array',
+            'scheduled_at'     => 'datetime',
+            'next_run_at'      => 'datetime',
+            'last_run_at'      => 'datetime',
+            'live_until'       => 'datetime',
         ];
     }
 

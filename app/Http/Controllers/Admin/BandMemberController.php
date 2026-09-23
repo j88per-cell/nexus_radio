@@ -16,7 +16,7 @@ class BandMemberController extends Controller
     {
         $q = trim($request->search ?? '');
 
-        $artists = Artist::when($q, fn($query) => $query->where('name', 'ilike', "%{$q}%"))
+        $artists = Artist::when($q, fn($query) => $query->whereRaw('LOWER(name) LIKE ?', ['%' . mb_strtolower($q) . '%']))
             ->withCount('members')
             ->orderBy('name')
             ->paginate(30)
@@ -135,7 +135,7 @@ class BandMemberController extends Controller
         $q = $request->q ?? '';
 
         return response()->json(
-            Person::where('name', 'ilike', "%{$q}%")
+            Person::whereRaw('LOWER(name) LIKE ?', ['%' . mb_strtolower($q) . '%'])
                 ->orderBy('name')
                 ->limit(10)
                 ->get(['id', 'name', 'slug'])

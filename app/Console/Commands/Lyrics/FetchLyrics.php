@@ -28,11 +28,11 @@ class FetchLyrics extends Command
             ->whereDoesntHave('tags', fn($t) => $t->where('tag', 'instrumental'))
             ->when($artistFilter, fn($q) => $q->whereHas(
                 'tracks.release.artist',
-                fn($a) => $a->where('name', 'ilike', "%{$artistFilter}%")
+                fn($a) => $a->whereRaw('LOWER(name) LIKE ?', ['%' . mb_strtolower($artistFilter) . '%'])
             ))
             ->when($releaseFilter, fn($q) => $q->whereHas(
                 'tracks.release',
-                fn($r) => $r->where('title', 'ilike', "%{$releaseFilter}%")
+                fn($r) => $r->whereRaw('LOWER(title) LIKE ?', ['%' . mb_strtolower($releaseFilter) . '%'])
             ))
             ->orderBy('id');
 

@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Models\Concerns\HasEmbedding;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -10,11 +9,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Pgvector\Laravel\Vector;
 
 class Song extends Model
 {
-    use HasEmbedding, HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'title',
@@ -24,7 +22,6 @@ class Song extends Model
         'lyrics_attempts',
         'mb_fetched_at',
         'story',
-        'embedding',
         'blocked',
         'requires_predecessor_song_id',
     ];
@@ -32,7 +29,6 @@ class Song extends Model
     protected function casts(): array
     {
         return [
-            'embedding'       => Vector::class,
             'blocked'         => 'boolean',
             'lyrics_attempts' => 'integer',
         ];

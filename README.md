@@ -25,11 +25,16 @@ sibling project for movies/TV), but runs standalone.
 
 ## Stack
 
-- Laravel 13 (PHP 8.3), Postgres, Redis
+- Laravel 13 (PHP 8.3). Database is sqlite by default (zero extra services);
+  Postgres works too, just set `DB_CONNECTION=pgsql` and the usual `DB_*`
+  vars.
 - Inertia.js + Vue 3, Tailwind CSS, Vite
 - [Liquidsoap](https://www.liquidsoap.info/) for stream assembly, output to
   Icecast
 - Optional: [Navidrome](https://www.navidrome.org/) as the music source
+- Optional for production: Redis for sessions/cache/queue (defaults to
+  file-based sessions/cache and a synchronous queue, so nothing extra is
+  required to get started)
 
 ## Setup
 
@@ -37,15 +42,29 @@ sibling project for movies/TV), but runs standalone.
 composer install
 cp .env.example .env
 php artisan key:generate
-php artisan migrate
+touch database/database.sqlite   # only if using the default sqlite connection
+php artisan migrate --seed
 npm install
 npm run build
+php artisan serve
 ```
 
 Configure `.env` for your database, Navidrome instance (if used), and
 Liquidsoap connection details. Point `liquidsoap/radio.liq` at your Icecast
 server — station name/description/genre are read from `STATION_NAME`,
 `STATION_DESCRIPTION`, and `STATION_GENRE` in the environment.
+
+### Logging in
+
+There's no password login — it's magic-link only. `--seed` above creates a
+default user:
+
+- **Email**: `test@example.com`
+
+Enter that on the login page and it emails a signed sign-in link. With no
+real mailer configured (`MAIL_MAILER=log`, the default), that email is
+written to `storage/logs/laravel.log` instead of actually sending — open the
+log, find the link, and visit it directly. Links expire after 15 minutes.
 
 ## License
 

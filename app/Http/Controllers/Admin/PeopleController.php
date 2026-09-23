@@ -16,7 +16,7 @@ class PeopleController extends Controller
     {
         $q = trim($request->search ?? '');
 
-        $people = Person::when($q, fn($query) => $query->where('name', 'ilike', "%{$q}%"))
+        $people = Person::when($q, fn($query) => $query->whereRaw('LOWER(name) LIKE ?', ['%' . mb_strtolower($q) . '%']))
             ->withCount('artistMemberships')
             ->orderBy('name')
             ->paginate(50)
@@ -134,7 +134,7 @@ class PeopleController extends Controller
         $q = $request->q ?? '';
 
         return response()->json(
-            Person::where('name', 'ilike', "%{$q}%")
+            Person::whereRaw('LOWER(name) LIKE ?', ['%' . mb_strtolower($q) . '%'])
                 ->orderBy('name')
                 ->limit(10)
                 ->get(['id', 'name', 'slug'])

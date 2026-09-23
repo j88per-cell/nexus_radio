@@ -11,6 +11,16 @@ return [
         'timeout' => (int) env('LIQUIDSOAP_TIMEOUT', 5),
     ],
 
+    // Live DJ mic input — a broadcasting client (Mixxx, BUTT, OBS, etc.)
+    // connects here directly, not to Icecast. Laravel only sends mute/unmute
+    // over the telnet channel above; it never touches this connection.
+    'harbor' => [
+        'host'     => env('LIQUIDSOAP_HOST', '127.0.0.1'),
+        'port'     => (int) env('LIQUIDSOAP_HARBOR_PORT', 8001),
+        'mount'    => env('LIQUIDSOAP_HARBOR_MOUNT', 'live'),
+        'password' => env('LIQUIDSOAP_HARBOR_PASSWORD', 'passw0rd'),
+    ],
+
     'supervisor' => [
         'url'  => env('SUPERVISOR_URL', 'http://127.0.0.1:9001'),
         'user' => env('SUPERVISOR_USER'),
